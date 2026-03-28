@@ -1,0 +1,68 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Your Account - ShopZone{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+  <!-- Header -->
+  <div class="profile-header">
+    <div class="profile-avatar">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</div>
+    <div>
+      <div class="profile-name">{{ user.get_full_name|default:user.username }}</div>
+      <div class="profile-email">{{ user.email }}</div>
+      <div style="font-size:13px;opacity:.7;margin-top:4px;">Member since {{ user.date_joined|date:"F Y" }}</div>
+    </div>
+  </div>
+
+  <!-- Quick Links -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:24px;">
+    {% for item in "1234" %}
+    <a href="{% if forloop.counter == 1 %}{% url 'order_history' %}{% elif forloop.counter == 2 %}{% url 'cart' %}{% else %}#{% endif %}"
+       style="background:var(--white);border:1px solid var(--border);border-radius:4px;padding:20px;text-align:center;transition:box-shadow .2s;"
+       onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,.1)'" onmouseout="this.style.boxShadow=''">
+      <div style="font-size:32px;margin-bottom:8px;">
+        {% if forloop.counter == 1 %}📦{% elif forloop.counter == 2 %}🛒{% elif forloop.counter == 3 %}📍{% else %}❓{% endif %}
+      </div>
+      <div style="font-size:14px;font-weight:600;">
+        {% if forloop.counter == 1 %}Your Orders{% elif forloop.counter == 2 %}Your Cart{% elif forloop.counter == 3 %}Addresses{% else %}Help & Support{% endif %}
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">
+        {% if forloop.counter == 1 %}Track, return, or buy again{% elif forloop.counter == 2 %}View saved items{% elif forloop.counter == 3 %}Edit delivery addresses{% else %}Get support{% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+
+  <!-- Recent Orders -->
+  <h3 style="font-size:20px;font-weight:400;margin-bottom:12px;">Recent Orders</h3>
+  {% if orders %}
+  {% for order in orders %}
+  <div class="order-card" style="margin-bottom:10px;">
+    <div class="order-card-header">
+      <div><span>ORDER PLACED</span><strong>{{ order.created_at|date:"d M Y" }}</strong></div>
+      <div><span>TOTAL</span><strong>₹{{ order.total_price }}</strong></div>
+      <div class="order-id">
+        <a href="{% url 'order_detail' order.id %}" style="color:var(--amazon-link);">Order #{{ order.id }}</a>
+      </div>
+    </div>
+    <div class="order-card-body">
+      <div>
+        <span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span>
+        <div style="font-size:13px;color:var(--text-muted);margin-top:6px;">
+          {{ order.items.count }} item{{ order.items.count|pluralize }}
+        </div>
+      </div>
+      <a href="{% url 'order_detail' order.id %}" class="btn-secondary" style="font-size:13px;padding:7px 16px;">Details</a>
+    </div>
+  </div>
+  {% endfor %}
+  <div style="text-align:center;margin-top:12px;">
+    <a href="{% url 'order_history' %}" style="color:var(--amazon-link);font-size:14px;">View all orders →</a>
+  </div>
+  {% else %}
+  <div style="background:var(--white);border:1px solid var(--border);border-radius:4px;padding:32px;text-align:center;color:var(--text-muted);">
+    No orders yet. <a href="{% url 'home' %}" style="color:var(--amazon-link);">Start shopping!</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

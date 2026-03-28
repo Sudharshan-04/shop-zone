@@ -1,0 +1,118 @@
+{% extends 'store/base.html' %}
+{% load store_tags %}
+
+{% block title %}Shopping Cart - ShopZone{% endblock %}
+
+{% block content %}
+<div style="max-width:1200px;margin:16px auto;padding:0 16px;">
+  <h1 style="font-size:28px;font-weight:400;margin-bottom:4px;">Shopping Cart</h1>
+</div>
+
+{% if cart.items.all %}
+<div class="cart-page">
+  <!-- Cart Items -->
+  <div class="cart-main">
+    <div class="cart-header-row">
+      <span>Price</span>
+    </div>
+
+    {% for item in cart.items.all %}
+    <div class="cart-item">
+      <!-- Image -->
+      {% if item.product.image %}
+      <img class="cart-item-img" src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+      {% else %}
+      <div class="cart-item-placeholder">
+        {% if 'phone' in item.product.name|lower %}📱
+        {% elif 'laptop' in item.product.name|lower %}💻
+        {% elif 'book' in item.product.name|lower %}📚
+        {% else %}🛍️{% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Info -->
+      <div>
+        <a href="{% url 'product_detail' item.product.slug %}" class="cart-item-name">{{ item.product.name }}</a>
+        <div class="cart-item-stock">In Stock</div>
+        <div class="prime-badge">✓ prime Eligible</div>
+        <div class="cart-item-actions">
+          <!-- Qty -->
+          <form id="qty-form-{{ item.id }}" method="POST" action="{% url 'update_cart' item.id %}">
+            {% csrf_token %}
+            <div style="display:flex;align-items:center;gap:4px;background:#f0f2f2;border:1px solid #d5d9d9;border-radius:8px;padding:4px 8px;">
+              <button type="button" onclick="updateQty({{ item.id }}, -1)" style="border:none;background:none;cursor:pointer;font-size:16px;color:#333;">−</button>
+              <input id="qty-{{ item.id }}" class="qty-input" type="number" name="quantity" value="{{ item.quantity }}" min="1" max="99" style="width:40px;border:none;background:none;text-align:center;font-size:14px;font-weight:700;">
+              <button type="button" onclick="updateQty({{ item.id }}, 1)" style="border:none;background:none;cursor:pointer;font-size:16px;color:#333;">+</button>
+            </div>
+            <button type="submit" style="display:none;"></button>
+          </form>
+          <span style="color:#ccc;">|</span>
+          <form method="POST" action="{% url 'remove_from_cart' item.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button class="btn-remove" type="submit">Delete</button>
+          </form>
+          <span style="color:#ccc;">|</span>
+          <button class="btn-remove">Save for later</button>
+          <span style="color:#ccc;">|</span>
+          <button class="btn-remove" onclick="submitQtyUpdate({{ item.id }})">Update</button>
+        </div>
+      </div>
+
+      <!-- Price -->
+      <div class="cart-item-price">₹{{ item.subtotal }}</div>
+    </div>
+    {% endfor %}
+
+    <div class="cart-subtotal">
+      Subtotal ({{ cart.total_items }} item{{ cart.total_items|pluralize }}):
+      <strong>₹{{ cart.total_price }}</strong>
+    </div>
+  </div>
+
+  <!-- Sidebar Summary -->
+  <div class="cart-sidebar">
+    <div style="color:var(--green);font-size:14px;margin-bottom:12px;">
+      ✅ Your order qualifies for FREE Delivery
+    </div>
+    <div class="cart-summary-title">
+      Subtotal ({{ cart.total_items }} item{{ cart.total_items|pluralize }}):
+      <strong>₹{{ cart.total_price }}</strong>
+    </div>
+    <div style="margin:12px 0;">
+      <input type="checkbox" id="gift" checked> <label for="gift" style="font-size:13px;">This order contains a gift</label>
+    </div>
+    <a href="{% url 'checkout' %}" class="btn-checkout">Proceed to Buy ({{ cart.total_items }} item{{ cart.total_items|pluralize }})</a>
+
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
+      <div class="summary-row">
+        <span>Items:</span><span>₹{{ cart.total_price }}</span>
+      </div>
+      <div class="summary-row">
+        <span>Delivery:</span><span style="color:var(--green);">FREE</span>
+      </div>
+      <div class="summary-row">
+        <span>Total GST:</span><span>Included</span>
+      </div>
+      <div class="summary-total">
+        <span>Order Total:</span><span>₹{{ cart.total_price }}</span>
+      </div>
+    </div>
+
+    <div style="font-size:12px;color:var(--text-muted);margin-top:12px;text-align:center;">
+      🔒 Secure transaction
+    </div>
+  </div>
+</div>
+
+{% else %}
+<div style="max-width:1200px;margin:0 auto;padding:0 16px 32px;">
+  <div class="cart-empty">
+    <div class="cart-empty-icon">🛒</div>
+    <h2>Your ShopZone Cart is empty</h2>
+    <p>Your shopping cart lives to serve. Give it purpose — fill it with groceries, clothing, household supplies, electronics, and more.</p>
+    <a href="{% url 'home' %}" class="btn-cart" style="display:inline-block;width:auto;padding:10px 32px;border-radius:20px;font-size:15px;">Continue Shopping</a>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

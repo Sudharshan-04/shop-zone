@@ -1,0 +1,172 @@
+{% extends 'store/base.html' %}
+{% load store_tags %}
+
+{% block title %}Checkout - ShopZone{% endblock %}
+
+{% block content %}
+<div style="max-width:1100px;margin:16px auto;padding:0 16px;">
+  <div style="font-size:24px;font-weight:400;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    🔒 Secure Checkout
+  </div>
+</div>
+
+<form method="POST" action="{% url 'checkout' %}">
+{% csrf_token %}
+<div class="checkout-page">
+
+  <!-- Left: Address + Payment -->
+  <div>
+
+    <!-- Shipping Address -->
+    <div class="checkout-form-section" style="margin-bottom:16px;">
+      <h2>📍 Shipping Address</h2>
+
+      <div class="form-group">
+        <label>Full Name *</label>
+        <input type="text" name="full_name" value="{{ user.get_full_name }}" required placeholder="Enter your full name">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Email Address *</label>
+          <input type="email" name="email" value="{{ user.email }}" required placeholder="email@example.com">
+        </div>
+        <div class="form-group">
+          <label>Phone Number *</label>
+          <input type="tel" name="phone" required placeholder="+91 00000 00000">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Full Address *</label>
+        <input type="text" name="address" required placeholder="House No., Street, Area, Landmark">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>City *</label>
+          <input type="text" name="city" required placeholder="City">
+        </div>
+        <div class="form-group">
+          <label>State *</label>
+          <input type="text" name="state" required placeholder="State">
+        </div>
+      </div>
+      <div class="form-group" style="max-width:200px;">
+        <label>PIN Code *</label>
+        <input type="text" name="pincode" required placeholder="000000" maxlength="6">
+      </div>
+    </div>
+
+    <!-- Payment Method -->
+    <div class="checkout-form-section">
+      <h2>💳 Payment Method</h2>
+      <div class="payment-options">
+        <label class="payment-option selected">
+          <input type="radio" name="payment_method" value="cod" checked>
+          <div class="payment-option-icon">💵</div>
+          <div class="payment-option-info">
+            <strong>Cash on Delivery</strong>
+            <span>Pay when your order arrives</span>
+          </div>
+        </label>
+        <label class="payment-option">
+          <input type="radio" name="payment_method" value="upi">
+          <div class="payment-option-icon">📱</div>
+          <div class="payment-option-info">
+            <strong>UPI Payment</strong>
+            <span>Google Pay, PhonePe, Paytm & more</span>
+          </div>
+        </label>
+        <label class="payment-option">
+          <input type="radio" name="payment_method" value="card">
+          <div class="payment-option-icon">💳</div>
+          <div class="payment-option-info">
+            <strong>Credit / Debit Card</strong>
+            <span>Visa, Mastercard, RuPay</span>
+          </div>
+        </label>
+      </div>
+
+      <!-- Demo card fields (hidden by default, no real processing) -->
+      <div id="card-fields" style="margin-top:16px;display:none;background:#f9f9f9;border:1px solid var(--border);border-radius:4px;padding:16px;">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">🔒 Demo mode — no real payment processed</div>
+        <div class="form-group">
+          <label>Card Number</label>
+          <input type="text" placeholder="4111 1111 1111 1111" maxlength="19">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Expiry</label>
+            <input type="text" placeholder="MM/YY" maxlength="5">
+          </div>
+          <div class="form-group">
+            <label>CVV</label>
+            <input type="text" placeholder="123" maxlength="4">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Order Summary -->
+  <div class="checkout-summary">
+    <h3 style="font-size:18px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);">Order Summary</h3>
+
+    {% for item in cart.items.all %}
+    <div style="display:flex;gap:10px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #f0f0f0;">
+      <div style="font-size:28px;flex-shrink:0;">
+        {% if item.product.image %}
+        <img src="{{ item.product.image.url }}" style="width:48px;height:48px;object-fit:contain;border:1px solid #eee;border-radius:4px;">
+        {% else %}🛍️{% endif %}
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:600;line-height:1.3;">{{ item.product.name|truncatechars:40 }}</div>
+        <div style="font-size:12px;color:var(--text-muted);">Qty: {{ item.quantity }}</div>
+        <div style="font-size:14px;font-weight:700;">₹{{ item.subtotal }}</div>
+      </div>
+    </div>
+    {% endfor %}
+
+    <div class="summary-row" style="margin-top:8px;">
+      <span>Items ({{ cart.total_items }}):</span>
+      <span>₹{{ cart.total_price }}</span>
+    </div>
+    <div class="summary-row">
+      <span>Delivery:</span>
+      <span style="color:var(--green);font-weight:700;">FREE</span>
+    </div>
+    <div class="summary-row">
+      <span>GST:</span>
+      <span>Included</span>
+    </div>
+    <div class="summary-total">
+      <span>Order Total:</span>
+      <span style="color:var(--price-color);">₹{{ cart.total_price }}</span>
+    </div>
+
+    <button type="submit" class="btn-place-order">🔒 Place your order</button>
+
+    <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:12px;line-height:1.5;">
+      By placing your order, you agree to ShopZone's <a href="#" style="color:var(--amazon-link);">privacy notice</a> and <a href="#" style="color:var(--amazon-link);">conditions of use</a>.
+    </div>
+
+    <div style="margin-top:16px;padding:12px;background:#f7f7f7;border-radius:4px;font-size:12px;">
+      <strong>🔒 Safe & Secure</strong><br>
+      We protect your security and privacy. Our payment security system encrypts your information during transmission.
+    </div>
+  </div>
+</div>
+</form>
+
+<script>
+document.querySelectorAll('input[name="payment_method"]').forEach(r => {
+  r.addEventListener('change', function() {
+    document.getElementById('card-fields').style.display = this.value === 'card' ? 'block' : 'none';
+  });
+});
+document.querySelectorAll('.payment-option').forEach(opt => {
+  opt.addEventListener('click', function() {
+    document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+    this.classList.add('selected');
+  });
+});
+</script>
+{% endblock %}

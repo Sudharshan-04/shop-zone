@@ -1,0 +1,40 @@
+{% extends 'store/base.html' %}
+{% load store_tags %}
+
+{% block title %}Search: {{ query }} - ShopZone{% endblock %}
+
+{% block content %}
+<div class="main-wrapper">
+  <main class="main-content" style="width:100%;">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Results for "{{ query }}"</h2>
+        <div style="font-size:13px;color:var(--text-muted);">{{ products|length }} result{{ products|length|pluralize }}</div>
+      </div>
+    </div>
+
+    {% if products %}
+    <div class="product-grid">
+      {% for product in products %}
+      {% include 'store/product_card.html' %}
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-results" style="background:var(--white);border:1px solid var(--border);border-radius:4px;padding:48px;">
+      <div style="font-size:64px;margin-bottom:16px;">🔍</div>
+      <h3 style="margin-bottom:8px;">No results for "{{ query }}"</h3>
+      <p>Check your spelling or try a different search term.</p>
+      <div style="margin-top:20px;">
+        <strong>Try:</strong>
+        <ul style="text-align:left;display:inline-block;margin-top:8px;">
+          <li>Checking for typos</li>
+          <li>Using more general terms</li>
+          <li>Searching by category</li>
+        </ul>
+      </div>
+      <a href="{% url 'home' %}" style="display:inline-block;margin-top:20px;" class="btn-cart">Browse All Products</a>
+    </div>
+    {% endif %}
+  </main>
+</div>
+{% endblock %}

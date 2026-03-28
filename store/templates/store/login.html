@@ -1,0 +1,44 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Sign In - ShopZone{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div>
+    <div class="auth-logo">Shop<span>Zone</span></div>
+    <div class="auth-box">
+      <h2>Sign In</h2>
+
+      <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="username">Email or mobile phone number</label>
+          <input type="text" id="username" name="username" required autofocus placeholder="Enter your username or email">
+        </div>
+        <div class="form-group">
+          <label for="password">Password <a href="#" style="font-weight:400;float:right;color:var(--amazon-link);font-size:12px;">Forgot password?</a></label>
+          <input type="password" id="password" name="password" required placeholder="Enter your password">
+        </div>
+        <button type="submit" class="btn-primary">Sign In</button>
+      </form>
+
+      <div style="font-size:12px;color:var(--text-muted);margin:16px 0;line-height:1.5;">
+        By continuing, you agree to ShopZone's <a href="#" style="color:var(--amazon-link);">Conditions of Use</a> and <a href="#" style="color:var(--amazon-link);">Privacy Notice</a>.
+      </div>
+
+      <div class="auth-divider">New to ShopZone?</div>
+
+      <a href="{% url 'signup' %}" class="btn-primary" style="display:block;text-align:center;background:linear-gradient(to bottom,#f7f8fa,#e7e9ec);border-color:#adb1b8;color:#0f1111;text-decoration:none;">
+        Create your ShopZone account
+      </a>
+    </div>
+
+    <div class="auth-terms">
+      <span>Conditions of Use</span> &nbsp;|&nbsp;
+      <span>Privacy Notice</span> &nbsp;|&nbsp;
+      <span>Help</span><br><br>
+      © {% now "Y" %} ShopZone.in
+    </div>
+  </div>
+</div>
+{% endblock %}

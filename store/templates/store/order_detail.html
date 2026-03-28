@@ -1,0 +1,64 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Order #{{ order.id }} - ShopZone{% endblock %}
+
+{% block content %}
+<div class="orders-page">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <h2>Order Details</h2>
+    <a href="{% url 'order_history' %}" style="color:var(--amazon-link);font-size:14px;">← Back to orders</a>
+  </div>
+
+  <div class="order-card" style="margin-bottom:16px;">
+    <div class="order-card-header">
+      <div><span>ORDER PLACED</span><strong>{{ order.created_at|date:"d M Y" }}</strong></div>
+      <div><span>TOTAL</span><strong>₹{{ order.total_price }}</strong></div>
+      <div><span>STATUS</span><strong><span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span></strong></div>
+      <div class="order-id">Order # <strong>{{ order.id }}</strong></div>
+    </div>
+    <div style="padding:20px;">
+      {% for item in order.items.all %}
+      <div style="display:flex;gap:16px;padding:12px 0;border-bottom:1px solid #f0f0f0;align-items:center;">
+        <div style="font-size:40px;width:60px;text-align:center;flex-shrink:0;">
+          {% if item.product.image %}<img src="{{ item.product.image.url }}" style="width:60px;height:60px;object-fit:contain;">
+          {% else %}🛍️{% endif %}
+        </div>
+        <div style="flex:1;">
+          <a href="{% url 'product_detail' item.product.slug %}" style="font-size:15px;color:var(--amazon-link);">{{ item.product.name }}</a>
+          <div style="font-size:13px;color:var(--text-muted);">Qty: {{ item.quantity }}</div>
+          <div style="font-size:14px;">₹{{ item.price }} each</div>
+        </div>
+        <div style="font-size:16px;font-weight:700;">₹{{ item.subtotal }}</div>
+      </div>
+      {% endfor %}
+
+      <div style="text-align:right;margin-top:12px;font-size:18px;font-weight:700;">
+        Total: ₹{{ order.total_price }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Shipping Info -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="order-card">
+      <div class="order-card-header"><strong>📍 Delivery Address</strong></div>
+      <div style="padding:16px;font-size:14px;line-height:1.7;">
+        <strong>{{ order.full_name }}</strong><br>
+        {{ order.address }}<br>
+        {{ order.city }}, {{ order.state }} - {{ order.pincode }}<br>
+        📞 {{ order.phone }}<br>
+        ✉️ {{ order.email }}
+      </div>
+    </div>
+    <div class="order-card">
+      <div class="order-card-header"><strong>💳 Payment Info</strong></div>
+      <div style="padding:16px;font-size:14px;line-height:1.7;">
+        <strong>Method:</strong> {{ order.get_payment_method_display }}<br>
+        <strong>Status:</strong> {% if order.payment_status %}✅ Paid{% else %}⏳ Pending{% endif %}<br>
+        <strong>Order Date:</strong> {{ order.created_at|date:"d M Y, H:i" }}<br>
+        <strong>Total:</strong> ₹{{ order.total_price }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

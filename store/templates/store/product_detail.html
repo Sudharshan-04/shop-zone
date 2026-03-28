@@ -1,0 +1,127 @@
+{% extends 'store/base.html' %}
+{% load store_tags %}
+
+{% block title %}{{ product.name }} - ShopZone{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb -->
+<div class="breadcrumb">
+  <a href="{% url 'home' %}">Home</a>
+  <span>›</span>
+  <a href="{% url 'home' %}?category={{ product.category.slug }}">{{ product.category.name }}</a>
+  <span>›</span>
+  <span>{{ product.name|truncatechars:50 }}</span>
+</div>
+
+<div class="detail-page">
+  <div class="detail-main">
+
+    <!-- Images -->
+    <div class="detail-images">
+      {% if product.image %}
+      <img class="main-img" src="{{ product.image.url }}" alt="{{ product.name }}">
+      {% else %}
+      <div class="main-img" style="display:flex;align-items:center;justify-content:center;font-size:120px;background:#f8f8f8;border:1px solid #ddd;border-radius:4px;aspect-ratio:1;">
+        {% if 'phone' in product.name|lower %}📱
+        {% elif 'laptop' in product.name|lower %}💻
+        {% elif 'book' in product.name|lower %}📚
+        {% elif 'watch' in product.name|lower %}⌚
+        {% elif 'camera' in product.name|lower %}📷
+        {% elif 'headphone' in product.name|lower %}🎧
+        {% else %}🛍️
+        {% endif %}
+      </div>
+      {% endif %}
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        {% for i in "1234" %}
+        <div style="border:2px solid {% if forloop.first %}var(--amazon-orange){% else %}#ddd{% endif %};border-radius:4px;padding:4px;cursor:pointer;font-size:32px;background:#f8f8f8;flex:1;text-align:center;">🛍️</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="detail-info">
+      <div class="product-category">{{ product.category.name }}</div>
+      <h1>{{ product.name }}</h1>
+      <div class="detail-brand">Brand: <a href="#" style="color:var(--amazon-link);">ShopZone Premium</a></div>
+
+      <div class="detail-rating">
+        <div class="star-icons" style="color:var(--star-color);font-size:18px;">
+          {% for i in product.rating|range_filter %}★{% endfor %}{% for i in product.rating|empty_stars %}☆{% endfor %}
+        </div>
+        <span style="color:var(--amazon-link);font-size:14px;">{{ product.rating }} out of 5</span>
+        <span style="color:var(--text-muted);font-size:13px;">{{ product.rating_count }} ratings</span>
+      </div>
+
+      <div class="detail-price">
+        <div style="font-size:13px;color:var(--text-muted);">Price:</div>
+        <span class="price-main" style="font-size:26px;">₹{{ product.price }}</span>
+        {% if product.original_price %}
+        <span class="price-original" style="font-size:16px;">M.R.P.: ₹{{ product.original_price }}</span>
+        <span class="price-discount" style="font-size:16px;">Save ₹{{ product.original_price|multiply:1|floatformat:0 }} ({{ product.discount_percent }}%)</span>
+        {% endif %}
+        <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Inclusive of all taxes</div>
+      </div>
+
+      <div class="prime-badge" style="font-size:14px;margin-bottom:12px;">✓ prime FREE Delivery | No minimum order</div>
+
+      <div class="detail-desc">{{ product.description }}</div>
+
+      <div class="detail-features">
+        <strong style="display:block;margin-bottom:6px;">About this item:</strong>
+        <ul>
+          <li>✅ Brand New & Sealed Product</li>
+          <li>🔄 Easy 30-day return policy</li>
+          <li>⭐ Top rated by {{ product.rating_count }}+ customers</li>
+          <li>🚚 Free delivery on all orders</li>
+          <li>🔒 ShopZone Assured product</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Buy Box -->
+    <div class="buy-box">
+      <div class="buy-box-price">₹{{ product.price }}</div>
+      <div style="font-size:13px;margin-bottom:6px;">
+        <span style="color:var(--amazon-link);">FREE Delivery</span> by Tomorrow
+      </div>
+      <div class="buy-box-delivery">Order within <strong>3 hrs 45 mins</strong></div>
+      <div style="font-size:13px;margin-bottom:12px;">📍 Deliver to <strong>India</strong></div>
+
+      {% if product.is_in_stock %}
+      <div class="buy-box-stock">✅ In Stock</div>
+      <select class="qty-select" id="qty">
+        {% for i in "12345678910" %}
+        <option value="{{ forloop.counter }}">Qty: {{ forloop.counter }}</option>
+        {% endfor %}
+      </select>
+      <a href="{% url 'add_to_cart' product.id %}" class="btn-buy-now">Buy Now</a>
+      <a href="{% url 'add_to_cart' product.id %}" class="btn-add-cart-lg">Add to Cart 🛒</a>
+      {% else %}
+      <div style="color:var(--price-color);font-size:16px;font-weight:700;margin-bottom:12px;">❌ Currently Unavailable</div>
+      {% endif %}
+
+      <div class="secure-tag">🔒 Secure transaction</div>
+      <div style="font-size:12px;margin-top:10px;color:var(--text-muted);">
+        Ships from: <strong>ShopZone</strong><br>
+        Sold by: <strong>ShopZone Direct</strong><br>
+        Returns: <strong>30 days return policy</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Related Products -->
+  {% if related_products %}
+  <div style="margin-top:24px;">
+    <h2 class="section-title" style="margin-bottom:12px;">Customers also bought</h2>
+    <div class="product-grid">
+      {% for rp in related_products %}
+      {% include 'store/product_card.html' with product=rp %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

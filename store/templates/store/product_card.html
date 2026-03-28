@@ -1,0 +1,61 @@
+{% load store_tags %}
+<div class="product-card">
+  {% if product.discount_percent > 0 %}
+  <span class="badge">-{{ product.discount_percent }}%</span>
+  {% endif %}
+  <span class="badge-prime">prime</span>
+
+  <a href="{% url 'product_detail' product.slug %}">
+    <div class="product-img-wrap">
+      {% if product.image %}
+      <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+      {% else %}
+      <div class="product-placeholder">
+        {% if 'phone' in product.name|lower or 'mobile' in product.name|lower %}📱
+        {% elif 'laptop' in product.name|lower or 'computer' in product.name|lower %}💻
+        {% elif 'book' in product.name|lower %}📚
+        {% elif 'shoe' in product.name|lower or 'boot' in product.name|lower %}👟
+        {% elif 'watch' in product.name|lower %}⌚
+        {% elif 'camera' in product.name|lower %}📷
+        {% elif 'headphone' in product.name|lower or 'earphone' in product.name|lower %}🎧
+        {% else %}🛍️
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </a>
+
+  <div class="product-info">
+    <div class="product-category">{{ product.category.name }}</div>
+    <a href="{% url 'product_detail' product.slug %}">
+      <div class="product-name">{{ product.name }}</div>
+    </a>
+
+    <!-- Stars -->
+    <div class="stars">
+      <span class="star-icons">
+        {% for i in product.rating|range_filter %}★{% endfor %}{% for i in product.rating|empty_stars %}☆{% endfor %}
+      </span>
+      <span class="star-count">{{ product.rating }} ({{ product.rating_count }})</span>
+    </div>
+
+    <!-- Price -->
+    <div class="product-price">
+      <span class="price-main"><span class="price-symbol">₹</span>{{ product.price }}</span>
+      {% if product.original_price %}
+      <span class="price-original">₹{{ product.original_price }}</span>
+      <span class="price-discount">{{ product.discount_percent }}% off</span>
+      {% endif %}
+    </div>
+
+    <div class="prime-badge">✓ prime FREE Delivery</div>
+
+    {% if product.is_in_stock %}
+    <span class="in-stock">In Stock</span>
+    {% else %}
+    <span class="out-stock">Out of Stock</span>
+    {% endif %}
+
+    <a href="{% url 'add_to_cart' product.id %}" class="btn-cart">Add to Cart 🛒</a>
+  </div>
+</div>

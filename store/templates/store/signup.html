@@ -1,0 +1,56 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Create Account - ShopZone{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div>
+    <div class="auth-logo">Shop<span>Zone</span></div>
+    <div class="auth-box" style="max-width:450px;">
+      <h2>Create Account</h2>
+
+      <form method="POST">
+        {% csrf_token %}
+        <div class="form-row">
+          <div class="form-group">
+            <label>First name</label>
+            <input type="text" name="first_name" required placeholder="First name" autofocus>
+          </div>
+          <div class="form-group">
+            <label>Last name</label>
+            <input type="text" name="last_name" required placeholder="Last name">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Username *</label>
+          <input type="text" name="username" required placeholder="Choose a unique username">
+          <div class="form-hint">Used for login. No spaces, special chars OK.</div>
+        </div>
+        <div class="form-group">
+          <label>Email address *</label>
+          <input type="email" name="email" required placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label>Password *</label>
+          <input type="password" name="password" required placeholder="At least 8 characters">
+          <div class="form-hint">Use letters, numbers, and symbols</div>
+        </div>
+        <div class="form-group">
+          <label>Re-enter password *</label>
+          <input type="password" name="password2" required placeholder="Confirm password">
+        </div>
+        <button type="submit" class="btn-primary">Create your ShopZone account</button>
+      </form>
+
+      <div class="auth-divider">Already have an account?</div>
+      <a href="{% url 'login' %}" class="btn-primary" style="display:block;text-align:center;background:linear-gradient(to bottom,#f7f8fa,#e7e9ec);border-color:#adb1b8;color:#0f1111;text-decoration:none;">
+        Sign in to your account
+      </a>
+
+      <div class="auth-terms">
+        By creating an account, you agree to ShopZone's <a href="#">Conditions of Use</a> and <a href="#">Privacy Notice</a>.
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

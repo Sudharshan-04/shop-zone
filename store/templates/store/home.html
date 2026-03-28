@@ -1,0 +1,137 @@
+{% extends 'store/base.html' %}
+{% load store_tags %}
+
+{% block title %}ShopZone - Earth's Biggest Store{% endblock %}
+
+{% block content %}
+
+<!-- Hero Banner -->
+{% if not query and not active_category %}
+<div class="hero">
+  <div class="hero-inner">
+    <h1>🛍️ Welcome to ShopZone</h1>
+    <p>Millions of products. Incredible prices. Lightning-fast delivery.</p>
+    <a href="{% url 'home' %}?sort=rating" class="hero-cta">Shop Best Sellers →</a>
+  </div>
+</div>
+{% endif %}
+
+<!-- Category Strip -->
+{% if categories %}
+<div class="category-strip">
+  <div class="category-strip-inner">
+    <h3>Shop by Category</h3>
+    <div class="category-cards">
+      <a href="{% url 'home' %}" class="cat-card {% if not active_category %}active{% endif %}">
+        <div class="cat-card-icon">🏪</div>
+        <div class="cat-card-name">All</div>
+      </a>
+      {% for cat in categories %}
+      <a href="{% url 'home' %}?category={{ cat.slug }}" class="cat-card {% if active_category.slug == cat.slug %}active{% endif %}">
+        <div class="cat-card-icon">
+          {% if 'electronic' in cat.slug %}📱
+          {% elif 'fashion' in cat.slug or 'cloth' in cat.slug %}👗
+          {% elif 'home' in cat.slug %}🏠
+          {% elif 'book' in cat.slug %}📚
+          {% elif 'sport' in cat.slug %}⚽
+          {% elif 'toy' in cat.slug %}🧸
+          {% elif 'beauty' in cat.slug %}💄
+          {% elif 'grocery' in cat.slug or 'food' in cat.slug %}🛒
+          {% else %}🏷️
+          {% endif %}
+        </div>
+        <div class="cat-card-name">{{ cat.name }}</div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Featured Products -->
+{% if featured_products and not query and not active_category %}
+<div class="page-pad" style="margin-bottom:0;">
+  <div class="section-header">
+    <h2 class="section-title">⭐ Featured Products</h2>
+    <a href="{% url 'home' %}?sort=rating" style="color:var(--amazon-link);font-size:13px;">See all →</a>
+  </div>
+  <div class="product-grid" style="margin-bottom:24px;">
+    {% for product in featured_products %}
+    {% include 'store/product_card.html' %}
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- Main: Sidebar + Products -->
+<div class="main-wrapper">
+
+  <!-- Sidebar Filters -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <h4>🗂 Categories</h4>
+      <a href="{% url 'home' %}" class="sidebar-link {% if not active_category %}active{% endif %}">All Products</a>
+      {% for cat in categories %}
+      <a href="{% url 'home' %}?category={{ cat.slug }}" class="sidebar-link {% if active_category.slug == cat.slug %}active{% endif %}">{{ cat.name }}</a>
+      {% endfor %}
+    </div>
+
+    <div class="sidebar-section">
+      <h4>💰 Price Range</h4>
+      <form class="price-filter" method="GET" action="{% url 'home' %}">
+        {% if active_category %}<input type="hidden" name="category" value="{{ active_category.slug }}">{% endif %}
+        {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+        <label>Min Price (₹)</label>
+        <input type="number" name="min_price" value="{{ min_price }}" placeholder="0" min="0">
+        <label>Max Price (₹)</label>
+        <input type="number" name="max_price" value="{{ max_price }}" placeholder="Any" min="0">
+        <button type="submit" class="filter-btn">Apply Filter</button>
+        {% if min_price or max_price %}<a href="{% url 'home' %}{% if active_category %}?category={{ active_category.slug }}{% endif %}" style="font-size:12px;color:var(--amazon-link);text-align:center;">Clear filters</a>{% endif %}
+      </form>
+    </div>
+  </aside>
+
+  <!-- Products -->
+  <main class="main-content">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">
+          {% if query %}Results for "{{ query }}"
+          {% elif active_category %}{{ active_category.name }}
+          {% else %}All Products
+          {% endif %}
+        </h2>
+        <div style="font-size:13px;color:var(--text-muted);">{{ products|length }} result{{ products|length|pluralize }}</div>
+      </div>
+      <form method="GET" action="{% url 'home' %}">
+        {% if active_category %}<input type="hidden" name="category" value="{{ active_category.slug }}">{% endif %}
+        {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+        {% if min_price %}<input type="hidden" name="min_price" value="{{ min_price }}">{% endif %}
+        {% if max_price %}<input type="hidden" name="max_price" value="{{ max_price }}">{% endif %}
+        <select class="sort-select" name="sort" onchange="this.form.submit()">
+          <option value="" {% if not sort %}selected{% endif %}>Featured</option>
+          <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+          <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+          <option value="rating" {% if sort == 'rating' %}selected{% endif %}>Avg. Customer Review</option>
+          <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest Arrivals</option>
+        </select>
+      </form>
+    </div>
+
+    {% if products %}
+    <div class="product-grid">
+      {% for product in products %}
+      {% include 'store/product_card.html' %}
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-results">
+      <div style="font-size:64px;margin-bottom:12px;">🔍</div>
+      <p>No products found{% if query %} for "<strong>{{ query }}</strong>"{% endif %}.</p>
+      <a href="{% url 'home' %}" style="color:var(--amazon-link);margin-top:8px;display:inline-block;">← Back to all products</a>
+    </div>
+    {% endif %}
+  </main>
+</div>
+
+{% endblock %}

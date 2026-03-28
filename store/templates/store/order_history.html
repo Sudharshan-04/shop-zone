@@ -1,0 +1,58 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Your Orders - ShopZone{% endblock %}
+
+{% block content %}
+<div class="orders-page">
+  <h2>📦 Your Orders</h2>
+
+  {% if orders %}
+  {% for order in orders %}
+  <div class="order-card">
+    <div class="order-card-header">
+      <div>
+        <span>ORDER PLACED</span>
+        <strong>{{ order.created_at|date:"d M Y" }}</strong>
+      </div>
+      <div>
+        <span>TOTAL</span>
+        <strong>₹{{ order.total_price }}</strong>
+      </div>
+      <div>
+        <span>PAYMENT</span>
+        <strong>{{ order.get_payment_method_display }}</strong>
+      </div>
+      <div class="order-id">
+        Order # {{ order.id }}
+        &nbsp;
+        <a href="{% url 'order_detail' order.id %}" style="color:var(--amazon-link);font-size:13px;">View order details</a>
+      </div>
+    </div>
+    <div class="order-card-body">
+      <div>
+        <span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span>
+        <div style="margin-top:8px;">
+          {% for item in order.items.all %}
+          <div style="font-size:14px;color:var(--text-muted);margin-top:4px;">
+            • {{ item.product.name }} × {{ item.quantity }}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;min-width:160px;">
+        <a href="{% url 'order_detail' order.id %}" class="btn-cart" style="border-radius:4px;font-size:13px;padding:7px;">View Order Details</a>
+        <a href="{% url 'home' %}" class="btn-secondary" style="font-size:13px;padding:7px;text-align:center;border-radius:4px;">Buy Again</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <div class="cart-empty" style="border:1px solid var(--border);border-radius:4px;">
+    <div class="cart-empty-icon">📦</div>
+    <h2>No orders yet</h2>
+    <p>You haven't placed any orders yet. Start shopping!</p>
+    <a href="{% url 'home' %}" class="btn-cart" style="display:inline-block;width:auto;padding:10px 32px;border-radius:20px;">Start Shopping</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

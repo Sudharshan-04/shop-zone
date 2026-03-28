@@ -1,0 +1,151 @@
+{% load static %}
+{% load store_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}ShopZone - Earth's Biggest Store{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'store/css/main.css' %}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛒</text></svg>">
+</head>
+<body>
+
+<!-- ═══════════════════ NAVBAR ═══════════════════ -->
+<nav class="navbar">
+  <div class="nav-top">
+
+    <!-- Logo -->
+    <a href="{% url 'home' %}" class="nav-logo">
+      <div>
+        <div class="nav-logo-text">Shop<span>Zone</span></div>
+        <div class="nav-logo-sub">.in</div>
+      </div>
+    </a>
+
+    <!-- Location -->
+    <div class="nav-location">
+      <span class="nav-location-top">📍 Deliver to</span>
+      <span class="nav-location-bot">India ▾</span>
+    </div>
+
+    <!-- Search -->
+    <form id="nav-search-form" class="nav-search" action="{% url 'search' %}" method="GET">
+      <select class="nav-search-cat" name="category" aria-label="Category">
+        <option value="">All</option>
+        {% for cat in categories %}
+        <option value="{{ cat.slug }}">{{ cat.name }}</option>
+        {% endfor %}
+      </select>
+      <input class="nav-search-input" type="text" name="q" placeholder="Search ShopZone" value="{{ request.GET.q }}" autocomplete="off">
+      <button class="nav-search-btn" type="submit" aria-label="Search">🔍</button>
+    </form>
+
+    <!-- Actions -->
+    <div class="nav-actions">
+      {% if user.is_authenticated %}
+      <a href="{% url 'profile' %}" class="nav-action">
+        <span class="nav-action-top">Hello, {{ user.first_name|default:user.username }}</span>
+        <span class="nav-action-bot">Account & Orders ▾</span>
+      </a>
+      <a href="{% url 'order_history' %}" class="nav-action">
+        <span class="nav-action-top">Returns</span>
+        <span class="nav-action-bot">& Orders</span>
+      </a>
+      <a href="{% url 'logout' %}" class="nav-action">
+        <span class="nav-action-top">Sign</span>
+        <span class="nav-action-bot">Out</span>
+      </a>
+      {% else %}
+      <a href="{% url 'login' %}" class="nav-action">
+        <span class="nav-action-top">Hello, sign in</span>
+        <span class="nav-action-bot">Account & Lists ▾</span>
+      </a>
+      <a href="{% url 'signup' %}" class="nav-action">
+        <span class="nav-action-top">New here?</span>
+        <span class="nav-action-bot">Sign Up</span>
+      </a>
+      {% endif %}
+
+      <!-- Cart -->
+      <a href="{% url 'cart' %}" class="nav-cart">
+        <span class="nav-cart-icon">🛒</span>
+        <span class="nav-cart-count">{{ cart_count }}</span>
+        <span class="nav-cart-text">Cart</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Sub-nav -->
+  <div class="nav-sub">
+    <div class="nav-sub-inner">
+      <a href="{% url 'home' %}" class="nav-sub-item {% if not request.GET.category %}active{% endif %}">🏠 All</a>
+      {% for cat in categories %}
+      <a href="{% url 'home' %}?category={{ cat.slug }}" class="nav-sub-item {% if request.GET.category == cat.slug %}active{% endif %}">{{ cat.name }}</a>
+      {% endfor %}
+      {% if user.is_authenticated %}
+      <a href="{% url 'order_history' %}" class="nav-sub-item">📦 My Orders</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════ MESSAGES ═══════════════════ -->
+{% if messages %}
+<div class="messages-container">
+  {% for message in messages %}
+  <div class="alert alert-{{ message.tags }}">
+    {% if message.tags == 'success' %}✅{% elif message.tags == 'error' %}❌{% elif message.tags == 'warning' %}⚠️{% else %}ℹ️{% endif %}
+    {{ message }}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- ═══════════════════ CONTENT ═══════════════════ -->
+{% block content %}{% endblock %}
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<div class="footer-top">
+  <div class="footer-top-inner">
+    <div class="footer-col">
+      <h4>Get to Know Us</h4>
+      <a href="#">About ShopZone</a>
+      <a href="#">Careers</a>
+      <a href="#">Press Releases</a>
+      <a href="#">ShopZone Cares</a>
+    </div>
+    <div class="footer-col">
+      <h4>Connect with Us</h4>
+      <a href="#">Facebook</a>
+      <a href="#">Twitter</a>
+      <a href="#">Instagram</a>
+      <a href="#">YouTube</a>
+    </div>
+    <div class="footer-col">
+      <h4>Make Money with Us</h4>
+      <a href="#">Sell on ShopZone</a>
+      <a href="#">Become an Affiliate</a>
+      <a href="#">Advertise Your Products</a>
+    </div>
+    <div class="footer-col">
+      <h4>Let Us Help You</h4>
+      <a href="#">ShopZone and COVID-19</a>
+      <a href="#">Your Account</a>
+      <a href="#">Returns Centre</a>
+      <a href="#">100% Purchase Protection</a>
+      <a href="#">Help</a>
+    </div>
+  </div>
+</div>
+<div class="footer-bottom">
+  <div class="footer-logo">Shop<span>Zone</span>.in</div>
+  <div>© {% now "Y" %} ShopZone. All rights reserved. Built with Django & ❤️</div>
+</div>
+
+<!-- Scroll-to-top -->
+<button id="scroll-top-btn" onclick="scrollTop()" style="display:none;position:fixed;bottom:24px;right:24px;background:var(--amazon-orange);color:var(--amazon-dark);border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);z-index:999;">▲</button>
+
+<script src="{% static 'store/js/main.js' %}"></script>
+</body>
+</html>
